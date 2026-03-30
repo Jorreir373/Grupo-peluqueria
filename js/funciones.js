@@ -1,63 +1,107 @@
-// Cuando se carga la página, ejecuta la función cargarTabla
 $(document).ready(function(){
     cargarTabla();
+    
+    // Configuración de fecha
+    const opciones = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+    $("#fecha-hoy").text(new Date().toLocaleDateString('es-ES', opciones));
+
+    // Cargar Tema Guardado
+    if(localStorage.getItem('tema') === 'dark') {
+        document.documentElement.setAttribute('data-theme', 'dark');
+        $("#icono-tema").removeClass('bi-moon-stars-fill').addClass('bi-sun-fill');
+    }
 });
 
-// Carga de la tabla desde listar.php
+// FUNCIÓN: Alternar Modo Claro/Oscuro
+function toggleTema() {
+    let htmlTag = document.documentElement;
+    let icono = $("#icono-tema");
+    
+    if (htmlTag.getAttribute('data-theme') === 'dark') {
+        htmlTag.removeAttribute('data-theme');
+        localStorage.setItem('tema', 'light');
+        icono.removeClass('bi-sun-fill').addClass('bi-moon-stars-fill');
+    } else {
+        htmlTag.setAttribute('data-theme', 'dark');
+        localStorage.setItem('tema', 'dark');
+        icono.removeClass('bi-moon-stars-fill').addClass('bi-sun-fill');
+    }
+}
+
 function cargarTabla(){
     $.ajax({
-        url: "backend/listar.php", // Archivo que devuelve la tabla
+        url: "backend/listar.php", 
         success: function(resp){
-            $("#tabla_turnos").html(resp); // La mostramos en el div
+            $("#tabla_turnos").html(resp); 
         }
     });
 }
 
-// Función para AGREGAR un turno
+function mostrarGuardar(id) {
+    let boton = $("#btn-guardar-" + id);
+    boton.removeClass("btn-guardar-oculto");
+    boton.addClass("animate__animated animate__bounceIn");
+}
+
 function agregar(){
-    // Tomamos los valores del formulario
     let cliente = $("#cliente").val();
+    let email = $("#email").val(); // Nuevo campo capturado
     let servicio = $("#servicio").val();
     let fecha = $("#fecha").val();
     let hora = $("#hora").val();
 
-    if(cliente=="" || servicio=="" || fecha=="" || hora==""){
-        alert("Completa todos los campos para registrar un turno");
+    if(cliente=="" || email=="" || servicio=="" || fecha=="" || hora==""){
+        Swal.fire({ icon: 'warning', title: 'Faltan datos', text: 'Completá todos los campos, incluyendo el email.' });
         return;
     }
 
-    // Enviamos los datos a agregar.php usando AJAX
-    $.post("backend/agregar.php",
-        {cliente, servicio, fecha, hora},
-        function(resp){
-            alert(resp);
+    // Sumamos email al envío POST
+    $.post("backend/agregar.php", {cliente, email, servicio, fecha, hora}, function(resp){
+        if(resp.includes("⚠")){
+            Swal.fire({ icon: 'error', title: 'Horario ocupado', text: 'Ya existe un turno en ese horario.' });
+        } else {
+            Swal.fire({ icon: 'success', title: '¡Guardado!', text: 'Se envió un correo al cliente.', timer: 2000, showConfirmButton: false });
+            $("#cliente, #email, #servicio, #fecha, #hora").val(''); 
             cargarTabla();
         }
-    );
-}
-
-// Función para BORRAR un turno
-function borrar(id){
-    $.post("backend/eliminar.php", {id}, function(resp){
-        alert(resp);
-        cargarTabla();
     });
 }
 
-// Función para EDITAR un turno
+function borrar(id){
+    Swal.fire({
+        title: '¿Eliminar turno?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#dc3545',
+        cancelButtonColor: '#6c757d',
+        confirmButtonText: 'Borrar',
+        cancelButtonText: 'Cancelar'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            $.post("backend/eliminar.php", {id}, function(resp){
+                cargarTabla();
+            });
+        }
+    });
+}
+
 function editar(id){
-    // Tomamos los valores editados en los inputs de la tabla
     let cliente = $("#c"+id).val();
+    let email = $("#e"+id).val(); // Capturamos email editado
     let servicio = $("#s"+id).val();
     let fecha = $("#f"+id).val();
     let hora = $("#h"+id).val();
 
-    // Enviamos a editar.php
-    $.post("backend/editar.php",
-        {id, cliente, servicio, fecha, hora},
-        function(resp){
-            alert(resp);
-            cargarTabla(); // Actualizamos la tabla
-        }
-    );
+    $.post("backend/editar.php", {id, cliente, email, servicio, fecha, hora}, function(resp){
+        Swal.fire({ icon: 'success', title: '¡Modificado!', timer: 1500, showConfirmButton: false });
+        cargarTabla();
+    });
+}
+
+function filtrarTurnos() {
+    let filtro = $("#buscador").val().toLowerCase();
+    $("#tabla_turnos tbody tr").each(function() {
+        let textoCliente = $(this).find("td:first-child input").val().toLowerCase();
+        $(this).toggle(textoCliente.indexOf(filtro) > -1);
+    });
 }
