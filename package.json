@@ -1,0 +1,25 @@
+{
+  "name": "grupo-peluqueria",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Jorreir373/Grupo-peluqueria.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Jorreir373/Grupo-peluqueria/issues"
+  },
+  "homepage": "https://github.com/Jorreir373/Grupo-peluqueria#readme",
+  "description": "",
+  "dependencies": {
+    "cors": "^2.8.6",
+    "express": "^5.2.1",
+    "nodemailer": "^8.0.4"
+  }
+}

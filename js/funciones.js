@@ -1,18 +1,15 @@
 $(document).ready(function(){
     cargarTabla();
     
-    // Configuración de fecha
     const opciones = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
     $("#fecha-hoy").text(new Date().toLocaleDateString('es-ES', opciones));
 
-    // Cargar Tema Guardado
     if(localStorage.getItem('tema') === 'dark') {
         document.documentElement.setAttribute('data-theme', 'dark');
         $("#icono-tema").removeClass('bi-moon-stars-fill').addClass('bi-sun-fill');
     }
 });
 
-// FUNCIÓN: Alternar Modo Claro/Oscuro
 function toggleTema() {
     let htmlTag = document.documentElement;
     let icono = $("#icono-tema");
@@ -45,7 +42,7 @@ function mostrarGuardar(id) {
 
 function agregar(){
     let cliente = $("#cliente").val();
-    let email = $("#email").val(); // Nuevo campo capturado
+    let email = $("#email").val(); 
     let servicio = $("#servicio").val();
     let fecha = $("#fecha").val();
     let hora = $("#hora").val();
@@ -55,12 +52,29 @@ function agregar(){
         return;
     }
 
-    // Sumamos email al envío POST
     $.post("backend/agregar.php", {cliente, email, servicio, fecha, hora}, function(resp){
         if(resp.includes("⚠")){
             Swal.fire({ icon: 'error', title: 'Horario ocupado', text: 'Ya existe un turno en ese horario.' });
         } else {
-            Swal.fire({ icon: 'success', title: '¡Guardado!', text: 'Se envió un correo al cliente.', timer: 2000, showConfirmButton: false });
+            $.post("http://localhost:3000/enviar-correo", {cliente, email, servicio, fecha, hora})
+                .done(function() {
+                    // Todo salió perfecto
+                    Swal.fire({ 
+                        icon: 'success', 
+                        title: '¡Guardado!', 
+                        text: 'Turno agendado y correo enviado.', 
+                        timer: 2500, 
+                        showConfirmButton: false 
+                    });
+                })
+                .fail(function() {
+                    Swal.fire({ 
+                        icon: 'warning', 
+                        title: 'Aviso', 
+                        text: 'Turno guardado, pero falló el envío del correo.' 
+                    });
+                });
+
             $("#cliente, #email, #servicio, #fecha, #hora").val(''); 
             cargarTabla();
         }
@@ -87,7 +101,7 @@ function borrar(id){
 
 function editar(id){
     let cliente = $("#c"+id).val();
-    let email = $("#e"+id).val(); // Capturamos email editado
+    let email = $("#e"+id).val();
     let servicio = $("#s"+id).val();
     let fecha = $("#f"+id).val();
     let hora = $("#h"+id).val();

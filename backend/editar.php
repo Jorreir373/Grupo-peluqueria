@@ -3,7 +3,7 @@ include "../conexion.php";
 
 $id = $_POST["id"];
 $cliente = $_POST["cliente"];
-$email = $_POST["email"]; // Recibimos el email actualizado
+$email = $_POST["email"];
 $servicio = $_POST["servicio"];
 $fecha = $_POST["fecha"];
 $hora = $_POST["hora"];
