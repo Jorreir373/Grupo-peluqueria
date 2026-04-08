@@ -81,7 +81,6 @@
             transform: translateY(-2px);
         }
 
-        /* Botón de tema flotante */
         .btn-tema-flotante {
             position: absolute;
             top: 20px;
@@ -140,7 +139,7 @@
     </div>
 
     <script>
-        // Lógica del modo oscuro
+  
         if(localStorage.getItem('tema') === 'dark') {
             document.documentElement.setAttribute('data-theme', 'dark');
             document.getElementById("icono-tema").className = 'bi bi-sun-fill';

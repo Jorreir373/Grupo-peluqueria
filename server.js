@@ -23,7 +23,7 @@ app.post('/enviar-correo', (req, res) => {
     const mailOptions = {
         from: 'Peluquería Estilo Único <tu_correo@gmail.com>',
         to: email,
-        subject: '¡Turno Confirmado! - Estilo Único ✂️',
+        subject: '¡Turno Confirmado! - Estilo Único',
         html: `
             <div style="font-family: Arial, sans-serif; padding: 20px; background-color: #f4f6f9; border-radius: 10px;">
                 <h2 style="color: #4f46e5;">¡Hola ${cliente}! 👋</h2>
@@ -51,5 +51,5 @@ app.post('/enviar-correo', (req, res) => {
 
 const PORT = 3000;
 app.listen(PORT, () => {
-    console.log(`🚀 Servidor de correos corriendo en http://localhost:${PORT}`);
+    console.log(`Servidor de correos corriendo en http://localhost:${PORT}`);
 });

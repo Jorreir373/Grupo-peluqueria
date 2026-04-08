@@ -285,9 +285,9 @@ $lista_personal = mysqli_query($conexion, "SELECT * FROM usuarios WHERE rol='emp
 
 const Toast = Swal.mixin({
     toast: true,
-    position: 'bottom-end', // Esquina inferior derecha
+    position: 'bottom-end',
     showConfirmButton: false,
-    timer: 4000, // Dura exactamente 4 segundos
+    timer: 4000,
     timerProgressBar: true,
     background: 'var(--bg-tarjeta)',
     color: 'var(--texto-principal)',
@@ -298,7 +298,6 @@ const Toast = Swal.mixin({
     }
 });
 
-// Funciones de Tema
 function toggleTema() {
     let html = document.documentElement;
     let icono = document.getElementById("icono-tema");
@@ -313,7 +312,6 @@ function toggleTema() {
     }
 }
 
-// Función para actualizar precios
 function actualizarPrecio(id) {
     let nuevoPrecio = $("#precio-" + id).val();
     
@@ -325,14 +323,12 @@ function actualizarPrecio(id) {
     });
 }
 
-// Función para cargar ingresos (CON RETRASO DE 3.5 SEGUNDOS)
 function cargarIngresos() {
     $("#valor-ingresos").addClass('d-none');
     $("#loader-ingresos").removeClass('d-none');
     
     $.getJSON('backend/calcular_ingresos.php', function(res) {
         if(res.ingresos) {
-            // Le forzamos una pausa visual de 3500 milisegundos (3.5 segundos)
             setTimeout(function() {
                 $("#loader-ingresos").addClass('d-none');
                 $("#valor-ingresos").text(res.ingresos).removeClass('d-none');
@@ -341,25 +337,20 @@ function cargarIngresos() {
     });
 }
 
-// Eventos al cargar el documento
 $(document).ready(function() {
-    // 1. Disparamos la ventanita flotante apenas entra
     Toast.fire({
         icon: 'info',
         title: 'Sincronizando datos',
         text: 'Cargando información, por favor espere...'
     });
 
-    // 2. Llamamos a los ingresos
     cargarIngresos();
-    
-    // 3. Cargar tema guardado
+
     if(localStorage.getItem('tema') === 'light') {
         document.documentElement.setAttribute('data-theme', 'light');
         document.getElementById("icono-tema").className = 'bi bi-moon-stars-fill';
     }
 
-    // Alerta si se creó un usuario
     const urlParams = new URLSearchParams(window.location.search);
     if(urlParams.get('msj') === 'usuario_creado') {
         Swal.fire({
