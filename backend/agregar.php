@@ -1,42 +1,24 @@
 <?php
+session_start();
 include "../conexion.php";
 
-$cliente = $_POST["cliente"];
-$email = $_POST["email"];
-$servicio = $_POST["servicio"];
-$fecha = $_POST["fecha"];
-$hora = $_POST["hora"];
+// Recibimos los datos de JavaScript
+$cliente = $_POST['cliente'];
+$telefono = $_POST['telefono']; // Actualizado a teléfono
+$servicio = $_POST['servicio'];
+$fecha = $_POST['fecha'];
+$hora = $_POST['hora'];
+$id_usuario = $_SESSION['id_usuario'];
 
-$duplicado = mysqli_query($conexion, "SELECT * FROM turnos WHERE fecha='$fecha' AND hora='$hora'");
-
-if(mysqli_num_rows($duplicado) > 0){
-    echo "⚠ Ya hay un turno registrado para ese horario";
+// Validamos que no haya un turno ocupado a esa misma hora y fecha
+$check = mysqli_query($conexion, "SELECT * FROM turnos WHERE fecha='$fecha' AND hora='$hora'");
+if(mysqli_num_rows($check) > 0){
+    echo "⚠"; // Símbolo de error para que JavaScript lo detecte
     exit;
 }
 
-$insert = mysqli_query($conexion,
-"INSERT INTO turnos(cliente, email, servicio, fecha, hora)
- VALUES('$cliente', '$email', '$servicio', '$fecha', '$hora')");
+// Insertamos el turno
+$insert = mysqli_query($conexion, "INSERT INTO turnos (cliente, telefono, servicio, fecha, hora, id_usuario) VALUES ('$cliente', '$telefono', '$servicio', '$fecha', '$hora', '$id_usuario')");
 
-if($insert){
-    $destinatario = $email;
-    $asunto = "Confirmacion de Turno - Estilo Unico";
-
-    $mensaje = "Hola $cliente,\n\n";
-    $mensaje .= "Tu turno ha sido confirmado con éxito.\n\n";
-    $mensaje .= "Detalles del turno:\n";
-    $mensaje .= "- Servicio: $servicio\n";
-    $mensaje .= "- Fecha: $fecha\n";
-    $mensaje .= "- Hora: $hora\n\n";
-    $mensaje .= "¡Te esperamos en Estilo Único!";
-    $headers = "From: no-reply@estilounico.com\r\n";
-    $headers .= "Reply-To: contacto@estilounico.com\r\n";
-    $headers .= "X-Mailer: PHP/" . phpversion();
-
-    @mail($destinatario, $asunto, $mensaje, $headers);
-
-    echo "Turno registrado correctamente";
-} else {
-    echo "Error al registrar turno";
-}
+echo $insert ? "Turno guardado" : "Error al guardar";
 ?>
