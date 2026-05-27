@@ -222,6 +222,20 @@ if(isset($_SESSION['id_usuario'])){
 
             <button class="btn-principal mb-4" onclick="iniciarSesion()">Ingresar al Panel <i class="bi bi-arrow-right ms-2"></i></button>
 
+            <div style="background: var(--bg-input); border: 1px dashed var(--borde); border-radius: 12px; padding: 1rem; margin-top: 1.5rem; text-align: center;">
+                <small class="text-muted fw-bold d-block mb-2 text-uppercase" style="font-size: 0.65rem; letter-spacing: 1px;">Cuentas de prueba:</small>
+                <div class="row g-2">
+                    <div class="col-6">
+                        <code class="d-block text-primary small" style="font-size: 0.8rem;">admin</code>
+                        <small class="text-muted" style="font-size: 0.7rem;">/ 123456</small>
+                    </div>
+                    <div class="col-6">
+                        <code class="d-block text-success small" style="font-size: 0.8rem;">empleado</code>
+                        <small class="text-muted" style="font-size: 0.7rem;">/ 123456</small>
+                    </div>
+                </div>
+            </div>
+
             <p class="text-center text-muted small">
                 ¿No tenés una cuenta? <span class="toggle-link" onclick="cambiarFormulario('registro')">Registrate acá</span>
             </p>
@@ -401,22 +415,27 @@ if(isset($_SESSION['id_usuario'])){
     }
 
     // --- AJAX: INICIAR SESIÓN ---
-    function iniciarSesion() {
-        let usuario = $("#log_usuario").val();
-        let password = $("#log_password").val();
+function iniciarSesion() {
+    let usuario = $("#log_usuario").val();
+    let password = $("#log_password").val();
 
-        if (usuario === "" || password === "") {
-            return Swal.fire({ icon: 'warning', title: 'Faltan datos', text: 'Completá usuario y contraseña.' });
-        }
-
-        $.post("backend/login_process.php", { usuario: usuario, password: password }, function(respuesta) {
-            if (respuesta.trim() === "ok") {
-                window.location.href = "turnos.php";
-            } else {
-                Swal.fire({ icon: 'error', title: 'Acceso Denegado', text: 'Usuario o contraseña incorrectos.' });
-            }
-        });
+    if (usuario === "" || password === "") {
+        return Swal.fire({ icon: 'warning', title: 'Faltan datos', text: 'Completá usuario y contraseña.' });
     }
+
+    $.post("backend/login_process.php", { usuario: usuario, password: password }, function(respuesta) {
+        let destino = respuesta.trim();
+
+        // Verificamos si la respuesta es una página válida (admin.php o turnos.php)
+        if (destino === "admin.php" || destino === "turnos.php") {
+            window.location.href = destino; // Redirige a donde dijo el servidor
+        } else if (destino === "error") {
+            Swal.fire({ icon: 'error', title: 'Acceso Denegado', text: 'Usuario o contraseña incorrectos.' });
+        } else {
+            Swal.fire({ icon: 'error', title: 'Error', text: 'Respuesta inesperada del servidor.' });
+        }
+    });
+}
 
     // --- AJAX: REGISTRAR USUARIO ---
     function registrarUsuario() {

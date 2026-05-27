@@ -1,21 +1,27 @@
 <?php
+error_reporting(0);
 session_start();
 include "../conexion.php";
 
 $usuario = $_POST['usuario'];
-$password = $_POST['password']; // Lectura en texto plano
+$password = $_POST['password'];
 
 $query = mysqli_query($conexion, "SELECT * FROM usuarios WHERE usuario = '$usuario' AND password = '$password'");
 
 if(mysqli_num_rows($query) > 0){
-    // Si los datos coinciden, iniciamos la sesión
     $datos = mysqli_fetch_assoc($query);
     $_SESSION['id_usuario'] = $datos['id'];
     $_SESSION['nombre'] = $datos['nombre'];
     $_SESSION['rol'] = $datos['rol'];
     
-    echo "ok"; // Respuesta de éxito para el AJAX
-}else{
-    echo "error"; // Respuesta de fallo
+    // AQUÍ ESTÁ LA LÓGICA DE REDIRECCIÓN:
+    if($datos['rol'] == 'admin') {
+        echo "admin.php"; // Si es admin, le decimos que vaya a admin.php
+    } else {
+        echo "turnos.php"; // Si es empleado (o cualquier otro), va a turnos.php
+    }
+} else {
+    echo "error"; // Si los datos están mal
 }
+exit();
 ?>
